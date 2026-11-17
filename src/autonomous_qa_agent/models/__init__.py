@@ -1,5 +1,6 @@
 """Domain data contracts. Depends on Pydantic only: no I/O, no frameworks."""
 
+from autonomous_qa_agent.models.agent import AgentRequest, AgentResponse, ErrorResponse
 from autonomous_qa_agent.models.analysis import FailureAnalysis, HealingRecommendation
 from autonomous_qa_agent.models.approval import ApprovalDecision, ApprovalItem, ApprovalRequest
 from autonomous_qa_agent.models.common import (
@@ -8,10 +9,14 @@ from autonomous_qa_agent.models.common import (
     Identifier,
     NonEmptyStr,
     SecretRef,
+    TraceId,
+    new_trace_id,
 )
 from autonomous_qa_agent.models.enums import (
     ActionRisk,
     ActionType,
+    AgentStatus,
+    AmbiguityKind,
     ApprovalKind,
     ConditionKind,
     DriverKind,
@@ -19,8 +24,12 @@ from autonomous_qa_agent.models.enums import (
     FailureCategory,
     HealingAction,
     LocatorStrategy,
+    Necessity,
     Platform,
     Priority,
+    Provenance,
+    QualityAttribute,
+    RiskCategory,
     RunStatus,
     Technique,
     TestStatus,
@@ -46,7 +55,9 @@ from autonomous_qa_agent.models.requirement import (
     Ambiguity,
     Requirement,
     RequirementAnalysis,
+    Risk,
     TestableCondition,
+    TestIdea,
 )
 from autonomous_qa_agent.models.results import (
     EvidenceRef,
@@ -59,7 +70,11 @@ from autonomous_qa_agent.models.scenario import TestScenario
 __all__ = [
     "ActionRisk",
     "ActionType",
+    "AgentRequest",
+    "AgentResponse",
+    "AgentStatus",
     "Ambiguity",
+    "AmbiguityKind",
     "ApprovalDecision",
     "ApprovalItem",
     "ApprovalKind",
@@ -70,6 +85,7 @@ __all__ = [
     "ContractModel",
     "DeviceProfile",
     "DriverKind",
+    "ErrorResponse",
     "EvidenceKind",
     "EvidenceRef",
     "ExecutableStep",
@@ -83,15 +99,20 @@ __all__ = [
     "InvalidRequestError",
     "Locator",
     "LocatorStrategy",
+    "Necessity",
     "NonEmptyStr",
     "PlannedTest",
     "Platform",
     "PolicyViolationError",
     "Priority",
+    "Provenance",
     "ProviderError",
     "QAAgentError",
+    "QualityAttribute",
     "Requirement",
     "RequirementAnalysis",
+    "Risk",
+    "RiskCategory",
     "RunReport",
     "RunStatus",
     "RunSummary",
@@ -99,10 +120,13 @@ __all__ = [
     "StepResult",
     "TargetEnvironment",
     "Technique",
+    "TestIdea",
     "TestResult",
     "TestScenario",
     "TestStatus",
     "TestableCondition",
+    "TraceId",
     "highest_risk",
     "latest_attempts",
+    "new_trace_id",
 ]

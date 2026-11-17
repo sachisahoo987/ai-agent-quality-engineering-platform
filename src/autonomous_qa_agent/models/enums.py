@@ -44,6 +44,59 @@ class ConditionKind(StrEnum):
     NON_FUNCTIONAL = "non_functional"
 
 
+class AmbiguityKind(StrEnum):
+    """Why part of a requirement cannot be tested as written."""
+
+    AMBIGUOUS = "ambiguous"  # present but vague or open to interpretation
+    MISSING = "missing"  # an acceptance criterion the requirement should state but does not
+
+
+class Necessity(StrEnum):
+    """Whether a clarification blocks testing."""
+
+    MANDATORY = "mandatory"  # the condition cannot be verified until this is answered
+    RECOMMENDED = "recommended"  # testing can start; answering it improves the tests
+
+
+class Provenance(StrEnum):
+    """Where an analysis finding comes from. Explicit facts are the conditions themselves."""
+
+    DERIVED = "derived"  # follows directly from the stated text (a stated limit's boundaries)
+    DOMAIN_PRACTICE = "domain_practice"  # common practice for this kind of feature; not stated
+    LLM_SUGGESTION = "llm_suggestion"  # proposed by the language model
+
+
+class QualityAttribute(StrEnum):
+    """Category of a non-functional requirement."""
+
+    PERFORMANCE = "performance"
+    SCALABILITY = "scalability"
+    RELIABILITY = "reliability"
+    AVAILABILITY = "availability"
+    SECURITY = "security"
+    USABILITY = "usability"
+
+
+class RiskCategory(StrEnum):
+    BUSINESS_IMPACT = "business_impact"
+    SECURITY = "security"
+    FINANCIAL = "financial"
+    DATA_LOSS = "data_loss"
+    PRIVACY = "privacy"
+    CONCURRENCY = "concurrency"
+    INTEGRATION = "integration"
+    DEVICE_COMPATIBILITY = "device_compatibility"
+    UNCLEAR_REQUIREMENT = "unclear_requirement"
+    OTHER = "other"
+
+
+class AgentStatus(StrEnum):
+    """Outcome of one agent invocation."""
+
+    COMPLETED = "completed"
+    NEEDS_CLARIFICATION = "needs_clarification"  # output is usable but has open questions
+
+
 class Technique(StrEnum):
     """Test design technique that produced a scenario."""
 

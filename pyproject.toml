@@ -9,6 +9,9 @@ dependencies = [
     "pydantic-settings>=2.6,<3",
 ]
 
+[project.scripts]
+qa-agent = "autonomous_qa_agent.cli:main"
+
 [dependency-groups]
 dev = [
     "mypy>=1.13",

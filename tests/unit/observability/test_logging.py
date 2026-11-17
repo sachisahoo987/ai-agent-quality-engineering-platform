@@ -11,9 +11,11 @@ from autonomous_qa_agent.observability import (
     REDACTED,
     configure_logging,
     current_log_context,
+    current_trace_id,
     get_logger,
     log_context,
     redact,
+    trace_context,
 )
 
 
@@ -172,3 +174,32 @@ def test_configure_is_idempotent_and_keeps_foreign_handlers() -> None:
 def test_configure_rejects_invalid_options(level: str, fmt: Any) -> None:
     with pytest.raises(ValueError, match="unsupported"):
         configure_logging(level, fmt)
+
+
+def test_trace_context_binds_a_new_trace_id(stream: io.StringIO) -> None:
+    assert current_trace_id() is None
+    with trace_context() as trace_id:
+        assert current_trace_id() == trace_id
+        get_logger("t").info("inside")
+    assert current_trace_id() is None
+    (line,) = _lines(stream)
+    assert line["trace_id"] == trace_id
+    assert len(trace_id) == 32
+
+
+def test_trace_context_continues_a_given_trace_and_nests() -> None:
+    outer = "0af7651916cd43dd8448eb211c80319c"
+    with trace_context(outer):
+        with trace_context() as inner:
+            assert current_trace_id() == inner != outer
+        assert current_trace_id() == outer
+
+
+@pytest.mark.parametrize("bad", ["", "xyz", "0AF7651916CD43DD8448EB211C80319C", "0" * 33])
+def test_trace_context_rejects_malformed_ids(bad: str) -> None:
+    with pytest.raises(ValueError, match="trace_id"), trace_context(bad):
+        pass  # pragma: no cover
+
+
+def test_trace_id_is_not_mistaken_for_a_secret() -> None:
+    assert redact({"trace_id": "abc"}) == {"trace_id": "abc"}

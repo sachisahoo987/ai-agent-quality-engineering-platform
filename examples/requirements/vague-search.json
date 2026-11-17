@@ -1,0 +1,6 @@
+{
+  "id": "REQ-SEARCH-1",
+  "title": "Fast product search",
+  "platform": "android",
+  "description": "Search should be fast and user-friendly. Results show some relevant products etc."
+}

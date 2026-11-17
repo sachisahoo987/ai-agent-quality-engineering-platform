@@ -2,8 +2,11 @@
 
 Each error carries a stable machine-readable ``code`` and a ``public_message`` that is safe to
 show to API callers. The constructor message is for logs only and may contain internal detail.
+``details`` are optional public-safe specifics, such as which fields failed validation; they
+must never contain input values or secrets.
 """
 
+from collections.abc import Iterable
 from typing import ClassVar
 
 
@@ -13,8 +16,9 @@ class QAAgentError(Exception):
     code: ClassVar[str] = "agent_error"
     public_message: ClassVar[str] = "The agent could not complete the request."
 
-    def __init__(self, message: str | None = None) -> None:
+    def __init__(self, message: str | None = None, *, details: Iterable[str] = ()) -> None:
         super().__init__(message or self.public_message)
+        self.details: tuple[str, ...] = tuple(details)
 
 
 class InvalidRequestError(QAAgentError):

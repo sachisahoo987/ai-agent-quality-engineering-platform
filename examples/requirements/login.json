@@ -1,0 +1,13 @@
+{
+  "id": "REQ-LOGIN-1",
+  "title": "User login",
+  "platform": "web",
+  "priority": "high",
+  "acceptance_criteria": [
+    "A registered user can sign in with a valid email and password",
+    "Password must be at least 8 characters",
+    "Email is required",
+    "After 5 failed attempts the account is locked for 15 minutes",
+    "An invalid password shows an error message"
+  ]
+}

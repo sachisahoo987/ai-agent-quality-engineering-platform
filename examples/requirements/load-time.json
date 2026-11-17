@@ -1,0 +1,6 @@
+{
+  "id": "REQ-LOAD-TIME",
+  "title": "Application load time",
+  "platform": "web",
+  "description": "The application should load quickly."
+}

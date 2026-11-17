@@ -1,0 +1,7 @@
+{
+  "id": "REQ-BANK-LOGIN",
+  "title": "Banking login",
+  "platform": "web",
+  "priority": "high",
+  "description": "As a customer, I should log in using mobile number and OTP."
+}

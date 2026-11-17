@@ -1,0 +1,6 @@
+{
+  "id": "REQ-CHECKOUT",
+  "title": "E-commerce checkout",
+  "platform": "web",
+  "description": "A customer should be able to add products to the cart, apply a discount coupon and complete payment."
+}

@@ -3,6 +3,7 @@
 from collections import Counter
 from collections.abc import Iterable
 from typing import Annotated
+from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
@@ -41,6 +42,15 @@ Contracts never hold secret values: they are checkpointed, logged and reported.
 
 Confidence = Annotated[float, Field(ge=0.0, le=1.0)]
 """A probability-like score in [0, 1]."""
+
+TraceId = Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{32}$")]
+"""Correlates every log line and response of one unit of work. 32 lowercase hex characters,
+the same shape as a W3C trace-context trace id, so it can be handed to tracing later."""
+
+
+def new_trace_id() -> str:
+    """A fresh random ``TraceId``."""
+    return uuid4().hex
 
 
 def find_duplicates(values: Iterable[str]) -> list[str]:

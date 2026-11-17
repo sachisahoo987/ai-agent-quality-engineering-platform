@@ -26,6 +26,8 @@ from datetime import UTC, datetime
 from types import MappingProxyType
 from typing import Any, Literal, TextIO
 
+from autonomous_qa_agent.models.common import new_trace_id
+
 REDACTED = "***REDACTED***"
 
 # A key is sensitive when one of its "_" or "-" separated segments is a sensitive word,
@@ -79,6 +81,31 @@ def log_context(**fields: Any) -> Iterator[None]:
         yield
     finally:
         _context.reset(token)
+
+
+TRACE_ID_FIELD = "trace_id"
+_TRACE_ID = re.compile(r"^[0-9a-f]{32}$")
+
+
+@contextmanager
+def trace_context(trace_id: str | None = None) -> Iterator[str]:
+    """Start (or continue) a trace: bind ``trace_id`` to every record emitted inside the block.
+
+    Pass the caller's id to continue its trace (for example one received in a request header),
+    or omit it to start a new one. Yields the id so it can be returned to the caller.
+    """
+    if trace_id is None:
+        trace_id = new_trace_id()
+    elif not _TRACE_ID.fullmatch(trace_id):
+        raise ValueError("trace_id must be 32 lowercase hexadecimal characters")
+    with log_context(**{TRACE_ID_FIELD: trace_id}):
+        yield trace_id
+
+
+def current_trace_id() -> str | None:
+    """The trace id bound by the innermost enclosing ``trace_context``, if any."""
+    value = _context.get().get(TRACE_ID_FIELD)
+    return value if isinstance(value, str) else None
 
 
 def _record_fields(record: logging.LogRecord) -> dict[str, Any]:
