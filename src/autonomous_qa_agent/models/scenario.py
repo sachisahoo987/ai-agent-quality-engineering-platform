@@ -1,49 +1,40 @@
-"""Test scenario model."""
+"""Test scenarios: human-readable, traceable to requirement conditions."""
 
-from __future__ import annotations
+from typing import Self
 
-from enum import StrEnum
-from uuid import UUID, uuid4
+from pydantic import Field, model_validator
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-
-
-class ScenarioPriority(StrEnum):
-    """Relative execution priority for a test scenario."""
-
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    CRITICAL = "critical"
+from autonomous_qa_agent.models.common import (
+    ContractModel,
+    Identifier,
+    NonEmptyStr,
+    find_duplicates,
+)
+from autonomous_qa_agent.models.enums import Priority, Technique
 
 
-class TestScenario(BaseModel):
-    """A test case with preconditions, actions, and observable expectations."""
+class TestScenario(ContractModel):
+    """A test case with preconditions, steps and observable expectations.
 
-    model_config = ConfigDict(frozen=True, extra="forbid")
+    ``traces_to`` links the scenario to the requirement conditions it verifies; a scenario that
+    verifies nothing is rejected.
+    """
 
-    scenario_id: UUID = Field(default_factory=uuid4)
-    title: str = Field(min_length=1, max_length=200)
-    description: str = Field(min_length=1, max_length=2_000)
-    steps: tuple[str, ...] = Field(min_length=1, max_length=100)
-    expected_result: str = Field(min_length=1, max_length=2_000)
-    priority: ScenarioPriority = ScenarioPriority.MEDIUM
-    tags: tuple[str, ...] = Field(default_factory=tuple, max_length=20)
+    __test__ = False
 
-    @field_validator("title", "description", "expected_result")
-    @classmethod
-    def text_must_not_be_blank(cls, value: str) -> str:
-        """Reject whitespace-only values and normalize surrounding whitespace."""
-        normalized = value.strip()
-        if not normalized:
-            raise ValueError("value must contain non-whitespace characters")
-        return normalized
+    id: Identifier
+    requirement_id: Identifier
+    title: NonEmptyStr = Field(max_length=200)
+    technique: Technique
+    priority: Priority = Priority.MEDIUM
+    preconditions: tuple[NonEmptyStr, ...] = Field(default=(), max_length=50)
+    steps: tuple[NonEmptyStr, ...] = Field(min_length=1, max_length=100)
+    expected_results: tuple[NonEmptyStr, ...] = Field(min_length=1, max_length=50)
+    traces_to: tuple[Identifier, ...] = Field(min_length=1)
+    tags: tuple[NonEmptyStr, ...] = Field(default=(), max_length=20)
 
-    @field_validator("steps", "tags")
-    @classmethod
-    def sequence_items_must_not_be_blank(cls, values: tuple[str, ...]) -> tuple[str, ...]:
-        """Normalize sequence entries and reject blank items."""
-        normalized = tuple(value.strip() for value in values)
-        if any(not value for value in normalized):
-            raise ValueError("sequence items must contain non-whitespace characters")
-        return normalized
+    @model_validator(mode="after")
+    def _unique_traces(self) -> Self:
+        if duplicated := find_duplicates(self.traces_to):
+            raise ValueError(f"duplicate condition ids in traces_to: {duplicated}")
+        return self
